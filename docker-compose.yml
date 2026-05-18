@@ -30,7 +30,14 @@ services:
     working_dir: /app
     volumes:
       - ${FRONTEND_PATH:-../frontend-vue3}:/app
-    command: sh -c "npm install && npm run dev"
+    command: >
+      sh -c "
+        if [ ! -f /app/package.json ]; then
+          echo '[frontend] package.json not found. Clone the frontend repo at FRONTEND_PATH (default: ../frontend-vue3).';
+          sleep infinity;
+        fi;
+        npm install && npm run dev
+      "
     ports:
       - "5173:5173"
     environment:

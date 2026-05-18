@@ -13,13 +13,27 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->api(prepend: [
-            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+            \Illuminate\Http\Middleware\HandleCors::class,
+        ]);
+        // Register auth guard alias for routes using 'auth:sanctum'
+        $middleware->alias([
+            'auth' => \Illuminate\Auth\Middleware\Authenticate::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (\Illuminate\Auth\AuthenticationException $e, Request $request) {
             if ($request->is('api/*') || $request->expectsJson()) {
-                return response()->json(['success' => false, 'message' => 'Unauthenticated.'], 401);
+                $payload = ['success' => false, 'message' => 'Unauthenticated.'];
+
+                // Local-only diagnostics to confirm whether bearer header is arriving.
+                if (app()->environment('local')) {
+                    $payload['debug'] = [
+                        'has_authorization_header' => $request->hasHeader('Authorization'),
+                        'auth_header_prefix' => substr((string) $request->header('Authorization', ''), 0, 12),
+                    ];
+                }
+
+                return response()->json($payload, 401);
             }
         });
 

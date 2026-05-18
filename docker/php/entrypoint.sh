@@ -22,6 +22,12 @@ if [ ! -f /var/www/.env ]; then
     cp /var/www/.env.example /var/www/.env
 fi
 
+# ── 1b. Ensure FRONTEND_URL is set in .env ────────────────────────────────────
+if ! grep -q "^FRONTEND_URL=" /var/www/.env; then
+    echo "[entrypoint] FRONTEND_URL not found in .env — adding default"
+    printf '\nFRONTEND_URL=http://localhost:5173\n' >> /var/www/.env
+fi
+
 # ── 2. Generate APP_KEY if empty ───────────────────────────────────────────────
 if grep -q "^APP_KEY=$" /var/www/.env; then
     echo "[entrypoint] Generating APP_KEY..."
@@ -36,7 +42,15 @@ done
 echo "[entrypoint] Database is ready."
 
 # ── 4. Run migrations ─────────────────────────────────────────────────────────
+# Remove duplicate Sanctum migration if present (we have our own)
+rm -f /var/www/database/migrations/2019_12_14_000001_create_personal_access_tokens_table.php
 php /var/www/artisan migrate --force
+
+# ── 4b. Publish Sanctum config only if not already present ─────────────────────
+if [ ! -f /var/www/config/sanctum.php ]; then
+    echo "[entrypoint] Publishing Sanctum config..."
+    php /var/www/artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider" --force || true
+fi
 
 # ── 5. Generate Swagger docs ──────────────────────────────────────────────────
 php /var/www/artisan l5-swagger:generate || true
