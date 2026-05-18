@@ -27,26 +27,30 @@ RUN docker-php-ext-install \
 # Composer 2.7
 COPY --from=composer:2.7 /usr/bin/composer /usr/bin/composer
 
+ENV COMPOSER_ALLOW_SUPERUSER=1
+
 WORKDIR /var/www
 
-# Copy composer files first for layer caching
-COPY composer.json composer.lock* ./
-
-RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist --optimize-autoloader
-
-# Copy full application
-COPY . .
-
-# Optimized autoloader
-RUN composer dump-autoload --optimize
-
-# Ensure required directories exist (git doesn't track empty dirs) and set permissions
+# Ensure required directories exist before composer scripts run
 RUN mkdir -p /var/www/storage/logs \
         /var/www/storage/framework/cache \
         /var/www/storage/framework/sessions \
         /var/www/storage/framework/views \
-        /var/www/bootstrap/cache \
-    && chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
+        /var/www/bootstrap/cache
+
+# Copy composer files first for layer caching
+COPY composer.json composer.lock* ./
+
+RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
+
+# Copy full application
+COPY . .
+
+# Optimized autoloader + package discovery
+RUN composer dump-autoload --optimize
+
+# Set permissions
+RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
     && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
 # Entrypoint

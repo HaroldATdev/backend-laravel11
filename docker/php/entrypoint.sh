@@ -1,7 +1,15 @@
 #!/bin/sh
 set -e
 
-# ── 0. Install dependencies if vendor is missing (bind-mount scenario) ────────
+# ── 0. Ensure required directories exist and are writable (bind-mount wipes them) ──
+mkdir -p /var/www/bootstrap/cache \
+         /var/www/storage/logs \
+         /var/www/storage/framework/cache \
+         /var/www/storage/framework/sessions \
+         /var/www/storage/framework/views
+chmod -R 775 /var/www/bootstrap/cache /var/www/storage
+
+# ── 1. Install dependencies if vendor is missing (bind-mount scenario) ────────
 if [ ! -f /var/www/vendor/autoload.php ]; then
     echo "[entrypoint] vendor/ not found — running composer install..."
     composer install --no-dev --prefer-dist --optimize-autoloader --working-dir=/var/www
