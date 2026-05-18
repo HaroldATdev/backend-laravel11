@@ -36,7 +36,7 @@ parent-folder/
 ### 1. Clone both repositories as sibling folders
 
 ```bash
-git clone https://github.com/HaroldATdev/backend-laravel11.git backend-laravel
+git clone https://github.com/HaroldATdev/backend-laravel11.git backend-laravel11
 git clone https://github.com/HaroldATdev/frontend-vue3.git frontend-vue3
 ```
 
