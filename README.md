@@ -19,9 +19,39 @@ REST API for inventory management. Migrated from **Laravel 8 / PHP 7.4** to **La
 
 ---
 
+## Project Structure
+
+This project is split across two repositories that must be sibling folders:
+
+```
+parent-folder/
+├── backend-laravel11/      ← this repo
+└── frontend-vue2/          ← frontend repo (separate)
+```
+
+---
+
 ## Quick Start with Docker
 
+### 1. Clone both repositories
+
 ```bash
+git clone https://github.com/HaroldATdev/backend-laravel11.git backend-laravel11
+git clone https://github.com/HaroldATdev/frontend-vue3.git frontend-vue2
+```
+
+### 2. Configure the frontend path (optional)
+
+The default expects the frontend folder to be named `../frontend-vue2` relative to the backend. If your folder name differs, set `FRONTEND_PATH` in `.env` (created automatically) or edit `.env.example` before the first run:
+
+```
+FRONTEND_PATH=../your-frontend-folder-name
+```
+
+### 3. Start everything
+
+```bash
+cd backend-laravel11
 docker compose up -d --build
 ```
 
@@ -29,11 +59,29 @@ That's it. The entrypoint script automatically:
 1. Creates `.env` from `.env.example` if it doesn't exist
 2. Generates `APP_KEY`
 3. Waits for MySQL to be ready
-4. Runs `migrate`
+4. Runs `php artisan migrate`
 5. Generates Swagger docs
 6. Starts PHP-FPM
 
-The API is then available at **http://localhost:8080**
+### 4. (Optional) Load seed data
+
+Seed 100 categories, 10 000 products and 30 000 stock movements:
+
+```bash
+docker compose exec backend php artisan db:seed
+```
+
+### Services started
+
+| Container | Role | Port (host) |
+|---|---|---|
+| `inventory_backend` | PHP 8.2-FPM | — (internal) |
+| `inventory_nginx` | Web server / reverse proxy | **8080** |
+| `inventory_frontend` | Vue dev server (Vite/npm) | **5173** |
+| `inventory_mysql` | MySQL 8.0 | 3307 |
+
+- API → **http://localhost:8080**
+- Frontend → **http://localhost:5173**
 
 ---
 

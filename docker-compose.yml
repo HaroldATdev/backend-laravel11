@@ -26,6 +26,21 @@ services:
     networks:
       - inventory_network
 
+  frontend:
+    image: node:20-alpine
+    container_name: inventory_frontend
+    restart: unless-stopped
+    working_dir: /app
+    volumes:
+      - ${FRONTEND_PATH:-../frontend-vue3}:/app
+    command: sh -c "npm ci && npm run dev"
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:8080/api
+    networks:
+      - inventory_network
+
   nginx:
     image: nginx:1.25-alpine
     container_name: inventory_nginx
