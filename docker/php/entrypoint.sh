@@ -1,6 +1,12 @@
 #!/bin/sh
 set -e
 
+# ── 0. Install dependencies if vendor is missing (bind-mount scenario) ────────
+if [ ! -f /var/www/vendor/autoload.php ]; then
+    echo "[entrypoint] vendor/ not found — running composer install..."
+    composer install --no-dev --prefer-dist --optimize-autoloader --working-dir=/var/www
+fi
+
 # ── 1. Create .env from example if it doesn't exist ───────────────────────────
 if [ ! -f /var/www/.env ]; then
     echo "[entrypoint] .env not found — copying from .env.example"
