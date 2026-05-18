@@ -22,21 +22,16 @@ REST API for inventory management. Migrated from **Laravel 8 / PHP 7.4** to **La
 ## Quick Start with Docker
 
 ```bash
-# 1. Configure environment
-cp .env.example .env
-
-# 2. Start all services
 docker compose up -d --build
-
-# 3. Generate app key
-docker compose exec backend php artisan key:generate
-
-# 4. Run migrations + seed (100 categories, 10k products, 30k movements)
-docker compose exec backend php artisan migrate --seed
-
-# 5. Generate Swagger docs
-docker compose exec backend php artisan l5-swagger:generate
 ```
+
+That's it. The entrypoint script automatically:
+1. Creates `.env` from `.env.example` if it doesn't exist
+2. Generates `APP_KEY`
+3. Waits for MySQL to be ready
+4. Runs `migrate`
+5. Generates Swagger docs
+6. Starts PHP-FPM
 
 The API is then available at **http://localhost:8080**
 
