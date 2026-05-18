@@ -25,50 +25,44 @@ This project is split across two repositories that must be sibling folders:
 
 ```
 parent-folder/
-├── backend-laravel11/      ← this repo
-└── frontend-vue2/          ← frontend repo (separate)
+├── backend-laravel/        ← this repo
+└── frontend-vue3/          ← frontend repo (separate)
 ```
 
 ---
 
 ## Quick Start with Docker
 
-### 1. Clone both repositories
+### 1. Clone both repositories as sibling folders
 
 ```bash
-git clone https://github.com/HaroldATdev/backend-laravel11.git backend-laravel11
-git clone https://github.com/HaroldATdev/frontend-vue3.git frontend-vue2
+git clone https://github.com/HaroldATdev/backend-laravel11.git backend-laravel
+git clone https://github.com/HaroldATdev/frontend-vue3.git frontend-vue3
 ```
 
-### 2. Configure the frontend path (optional)
-
-The default expects the frontend folder to be named `../frontend-vue2` relative to the backend. If your folder name differs, set `FRONTEND_PATH` in `.env` (created automatically) or edit `.env.example` before the first run:
-
-```
-FRONTEND_PATH=../your-frontend-folder-name
-```
-
-### 3. Start everything
+### 2. Start everything
 
 ```bash
-cd backend-laravel11
+cd backend-laravel
 docker compose up -d --build
 ```
 
-That's it. The entrypoint script automatically:
-1. Creates `.env` from `.env.example` if it doesn't exist
+The entrypoint script runs automatically on first boot:
+1. Copies `.env.example` → `.env` (if `.env` doesn't exist)
 2. Generates `APP_KEY`
 3. Waits for MySQL to be ready
 4. Runs `php artisan migrate`
 5. Generates Swagger docs
 6. Starts PHP-FPM
 
-### 4. (Optional) Load seed data
+> The `.env.example` already includes `FRONTEND_PATH=../frontend-vue3`. If you cloned the frontend under a different name, edit that variable before starting.
 
-Seed 100 categories, 10 000 products and 30 000 stock movements:
+### 3. Run migrations and seed data
+
+Migrations run automatically. To also load the seed data (100 categories, 10 000 products, 30 000 stock movements):
 
 ```bash
-docker compose exec backend php artisan db:seed
+docker compose exec backend php artisan migrate --seed
 ```
 
 ### Services started
@@ -80,8 +74,12 @@ docker compose exec backend php artisan db:seed
 | `inventory_frontend` | Vue dev server (Vite/npm) | **5173** |
 | `inventory_mysql` | MySQL 8.0 | 3307 |
 
-- API → **http://localhost:8080**
-- Frontend → **http://localhost:5173**
+| URL | Description |
+|---|---|
+| http://localhost:5173 | Frontend (Vue 3 / Vite) |
+| http://localhost:8080/api | REST API |
+| http://localhost:8080/api/documentation | Swagger UI |
+| http://localhost:8080/telescope | Laravel Telescope (local only) |
 
 ---
 
