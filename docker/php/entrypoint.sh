@@ -7,7 +7,8 @@ mkdir -p /var/www/bootstrap/cache \
          /var/www/storage/framework/cache \
          /var/www/storage/framework/sessions \
          /var/www/storage/framework/views
-chmod -R 775 /var/www/bootstrap/cache /var/www/storage
+chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
 # ── 1. Install dependencies if vendor is missing (bind-mount scenario) ────────
 if [ ! -f /var/www/vendor/autoload.php ]; then

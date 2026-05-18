@@ -3,6 +3,9 @@
 /public/storage
 /storage/*.key
 /storage/logs/
+/storage/framework/
+/storage/app/
+/storage/api-docs/
 /vendor
 .env
 .env.backup
