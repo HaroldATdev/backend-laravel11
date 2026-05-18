@@ -38,7 +38,7 @@ return [
             'processors' => [],
             'pattern' => null,
             'exclude' => [],
-            'open_api_spec_version' => env('L5_SWAGGER_OPEN_API_SPEC_VERSION', \OpenApi\Generator::OPENAPI_VERSION_DEFAULT),
+            'open_api_spec_version' => env('L5_SWAGGER_OPEN_API_SPEC_VERSION', '3.0.0'),
         ],
         'securityDefinitions' => [
             'securitySchemes' => [
